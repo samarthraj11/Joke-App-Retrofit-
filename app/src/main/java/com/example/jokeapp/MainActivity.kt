@@ -9,16 +9,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.example.jokeapp.ui.theme.JokeAppTheme
-import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -30,14 +26,12 @@ class MainActivity : ComponentActivity() {
             JokeAppTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
                     val joke = remember {
                         mutableStateOf("")
                     }
-                    val coroutineScope = rememberCoroutineScope()
-                    coroutineScope.launch launchWhenCreated@{
+                    LaunchedEffect(key1 = Unit, block = launchWhenCreated@{
                         val response = try {
                             RetrofitInstance.api.getJoke()
                         } catch (
@@ -51,22 +45,20 @@ class MainActivity : ComponentActivity() {
                         }
                         if (response.isSuccessful && response.body() != null) {
                             joke.value = response.body()!!.setup
-//                            HomeScreen(joke = joke.value)
+                            Log.d("output", joke.value)
+
                         }
-                        Log.d("output", joke.value)
-
-                    }
+                    })
                     HomeScreen(joke = joke.value)
-
-                    
                 }
             }
         }
     }
 }
 
+@Preview
 @Composable
-fun HomeScreen(joke: String) {
+fun HomeScreen(joke: String = "Sample") {
     Column(
         modifier = Modifier
             .padding(15.dp)
